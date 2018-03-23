@@ -149,13 +149,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 let flowerImageURL = wikiJSON["query"]["pages"][pageId]["thumbnail"]["source"].stringValue
                 self.imageSelected.sd_setImage(with: URL(string: flowerImageURL), completed: { (uiImage, _, _, _) in
                     
-                        let imageColor = UIColor(averageColorFrom: uiImage!)
-                        self.navigationController?.navigationBar.barTintColor = imageColor
-                        self.navigationController?.navigationBar.tintColor = ContrastColorOf(imageColor, returnFlat: true)
-                        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(imageColor, returnFlat: true)]
-                        self.view.backgroundColor = imageColor.lighten(byPercentage: 0.2)
-                        self.wikiLabel.textColor = ContrastColorOf(imageColor, returnFlat: true)
-                    })
+                    let imageColor = UIColor(averageColorFrom: uiImage!)
+                    self.navigationController?.navigationBar.barTintColor = imageColor
+                    self.navigationController?.navigationBar.tintColor = ContrastColorOf(imageColor, returnFlat: true)
+                    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(imageColor, returnFlat: true)]
+                    self.view.backgroundColor = imageColor.lighten(byPercentage: 0.2)
+                    self.wikiLabel.textColor = ContrastColorOf(imageColor, returnFlat: true)
+                })
                 
             }
             else {
