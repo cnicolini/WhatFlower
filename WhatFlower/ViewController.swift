@@ -24,10 +24,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     let imagePicker = UIImagePickerController()
     
+    var pickedImage: UIImage!
+    
     //MARK: - Wikipedia API
     // Request Sample: https://en.wikipedia.org/w/api.php?action=query&format=json&titles=Sunflower&prop=extracts&exintro=&explaintext=&indexpageids=&redirects=1
     
-    let wikipediaURl = "https://en.wikipedia.org/w/api.php"
+    let wikipediaURL = "https://en.wikipedia.org/w/api.php"
     
     var wikipediaParams : [String:String] = [
         "format" : "json",
@@ -61,9 +63,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        
+
+        imageSelected.image = nil
+
         if let image = info[UIImagePickerControllerEditedImage] as? UIImage {
-            imageSelected.image = nil
+    
+            pickedImage = image
             
             guard let ciimage = CIImage(image: image) else { fatalError("Error converting image to CIImage.") }
             
@@ -133,7 +138,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         wikipediaParams["titles"] = title
         
-        Alamofire.request(wikipediaURl, method: .get, parameters: wikipediaParams).responseJSON {
+        Alamofire.request(wikipediaURL, method: .get, parameters: wikipediaParams).responseJSON {
             response in
             if response.result.isSuccess {
                 print("Success! Got the wikipedia doc.")
@@ -149,12 +154,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 let flowerImageURL = wikiJSON["query"]["pages"][pageId]["thumbnail"]["source"].stringValue
                 self.imageSelected.sd_setImage(with: URL(string: flowerImageURL), completed: { (uiImage, _, _, _) in
                     
-                    let imageColor = UIColor(averageColorFrom: uiImage!)
-                    self.navigationController?.navigationBar.barTintColor = imageColor
-                    self.navigationController?.navigationBar.tintColor = ContrastColorOf(imageColor, returnFlat: true)
-                    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(imageColor, returnFlat: true)]
-                    self.view.backgroundColor = imageColor.lighten(byPercentage: 0.2)
-                    self.wikiLabel.textColor = ContrastColorOf(imageColor, returnFlat: true)
+                    let image = uiImage == nil ? self.pickedImage : uiImage
+
+                    self.updateImage(image!)
                 })
                 
             }
@@ -163,6 +165,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
         }
         
+    }
+    
+    func updateImage(_ image: UIImage!) {
+        let imageColor = UIColor(averageColorFrom: image)
+        self.navigationController?.navigationBar.barTintColor = imageColor
+        self.navigationController?.navigationBar.tintColor = ContrastColorOf(imageColor, returnFlat: true)
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : ContrastColorOf(imageColor, returnFlat: true)]
+        self.view.backgroundColor = imageColor.lighten(byPercentage: 0.2)
+        self.wikiLabel.textColor = ContrastColorOf(imageColor, returnFlat: true)
     }
     
 }
